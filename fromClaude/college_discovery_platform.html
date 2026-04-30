@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1a1a2e;
+  --accent:#e94560;
+  --accent2:#0f3460;
+  --surface:#16213e;
+  --card:#1a2744;
+  --text:#e8eaf0;
+  --muted:#8892a4;
+  --border:#2a3a5c;
+  --success:#22c55e;
+  --warn:#f59e0b;
+  --info:#38bdf8;
+  --radius:12px;
+  --font:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--primary);color:var(--text);font-family:var(--font);min-height:100vh}
+
+/* NAV */
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:0;position:sticky;top:0;z-index:100}
+.logo{font-size:1.3rem;font-weight:700;color:var(--accent);padding:1rem 1.5rem 1rem 0;letter-spacing:-0.5px}
+.logo span{color:var(--text)}
+.nav-tabs{display:flex;gap:0;flex:1}
+.nav-tab{padding:1.1rem 1.2rem;font-size:0.85rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.compare-badge{background:var(--accent);color:#fff;font-size:0.7rem;padding:1px 6px;border-radius:10px;margin-left:5px;font-weight:700}
+
+/* VIEWS */
+.view{display:none;padding:2rem;max-width:1200px;margin:0 auto}
+.view.active{display:block}
+
+/* SEARCH BAR */
+.search-wrap{margin-bottom:2rem}
+.search-row{display:flex;gap:12px;margin-bottom:1rem}
+.search-input{flex:1;background:var(--card);border:1px solid var(--border);color:var(--text);padding:0.75rem 1.1rem;border-radius:var(--radius);font-size:0.95rem;outline:none}
+.search-input::placeholder{color:var(--muted)}
+.search-input:focus{border-color:var(--accent)}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap}
+select.filter{background:var(--card);border:1px solid var(--border);color:var(--text);padding:0.55rem 0.9rem;border-radius:8px;font-size:0.85rem;cursor:pointer;outline:none}
+select.filter:focus{border-color:var(--accent)}
+.clear-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:0.55rem 0.9rem;border-radius:8px;cursor:pointer;font-size:0.85rem}
+.clear-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* COLLEGE GRID */
+.results-meta{color:var(--muted);font-size:0.85rem;margin-bottom:1rem}
+.college-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem}
+.college-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem;cursor:pointer;transition:all 0.2s;position:relative}
+.college-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:1rem}
+.college-logo{width:48px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;flex-shrink:0}
+.card-title{flex:1}
+.card-name{font-weight:600;font-size:0.95rem;line-height:1.3;color:var(--text)}
+.card-location{font-size:0.8rem;color:var(--muted);margin-top:3px}
+.card-rating{display:flex;align-items:center;gap:4px;font-size:0.82rem;color:var(--warn);font-weight:600;margin-top:4px}
+.card-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.chip{background:rgba(255,255,255,0.06);border:1px solid var(--border);padding:3px 10px;border-radius:20px;font-size:0.75rem;color:var(--muted)}
+.chip.green{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3);color:#4ade80}
+.card-actions{display:flex;gap:8px}
+.btn-sm{padding:6px 14px;border-radius:7px;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;transition:all 0.2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:0.85}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-outline.added{border-color:var(--success);color:var(--success)}
+.btn-full{width:100%;padding:0.75rem;border-radius:var(--radius);font-size:0.9rem;font-weight:600;cursor:pointer;border:none}
+
+/* PAGINATION */
+.pagination{display:flex;gap:8px;margin-top:1.5rem;justify-content:center;align-items:center}
+.page-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:0.85rem}
+.page-btn:hover,.page-btn.active{border-color:var(--accent);color:var(--accent)}
+.page-info{color:var(--muted);font-size:0.85rem}
+
+/* DETAIL VIEW */
+.back-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px;padding:0}
+.back-btn:hover{color:var(--text)}
+.detail-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;margin-bottom:1.5rem}
+.detail-hero-top{display:flex;gap:1.5rem;align-items:flex-start;margin-bottom:1.5rem}
+.detail-logo{width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.6rem;flex-shrink:0}
+.detail-title h1{font-size:1.5rem;font-weight:700;margin-bottom:6px}
+.detail-title .loc{color:var(--muted);font-size:0.9rem;margin-bottom:8px}
+.stat-row{display:flex;gap:1rem;flex-wrap:wrap}
+.stat-box{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1.1rem;text-align:center;min-width:100px}
+.stat-val{font-size:1.1rem;font-weight:700;color:var(--accent)}
+.stat-lbl{font-size:0.72rem;color:var(--muted);margin-top:2px}
+.section-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+.section-tab{padding:0.8rem 1.2rem;font-size:0.85rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s}
+.section-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.section-content{display:none}
+.section-content.active{display:block}
+
+/* COURSES */
+.course-list{display:grid;gap:0.8rem}
+.course-row{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.course-name{font-weight:500;font-size:0.9rem}
+.course-meta{display:flex;gap:8px}
+
+/* PLACEMENTS */
+.placement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem}
+.placement-stat{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}
+.placement-val{font-size:1.4rem;font-weight:700}
+.placement-lbl{font-size:0.78rem;color:var(--muted);margin-top:4px}
+.recruiter-list{display:flex;flex-wrap:wrap;gap:8px}
+.recruiter-chip{background:var(--card);border:1px solid var(--border);padding:5px 14px;border-radius:20px;font-size:0.8rem}
+
+/* REVIEWS */
+.review-list{display:grid;gap:1rem}
+.review-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:1.1rem}
+.review-header{display:flex;justify-content:space-between;margin-bottom:0.5rem;align-items:center}
+.reviewer{font-weight:500;font-size:0.88rem}
+.review-rating{color:var(--warn);font-size:0.82rem;font-weight:600}
+.review-text{color:var(--muted);font-size:0.84rem;line-height:1.5}
+
+/* COMPARE */
+.compare-intro{text-align:center;padding:3rem 2rem;color:var(--muted)}
+.compare-intro h2{color:var(--text);margin-bottom:0.5rem;font-size:1.3rem}
+.compare-table-wrap{overflow-x:auto}
+table.compare{width:100%;border-collapse:collapse;font-size:0.85rem}
+table.compare th{background:var(--card);padding:1rem 1.2rem;text-align:left;font-weight:600;font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+table.compare td{padding:0.9rem 1.2rem;border-bottom:1px solid var(--border);border-right:1px solid var(--border);vertical-align:top}
+table.compare tr:last-child td{border-bottom:none}
+table.compare td:first-child{background:rgba(255,255,255,0.02);color:var(--muted);font-size:0.8rem;font-weight:500;text-transform:uppercase;letter-spacing:0.3px;white-space:nowrap}
+table.compare th:last-child,table.compare td:last-child{border-right:none}
+.compare-college-header{font-weight:600;font-size:0.88rem;line-height:1.3}
+.compare-college-loc{color:var(--muted);font-size:0.78rem;margin-top:3px}
+.best{color:var(--success);font-weight:600}
+.compare-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center}
+.compare-remove{background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:0.75rem}
+.compare-remove:hover{border-color:#ef4444;color:#ef4444}
+
+/* PREDICTOR */
+.predictor-wrap{max-width:560px;margin:0 auto;padding:2rem 0}
+.predictor-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2rem}
+.predictor-card h2{font-size:1.2rem;font-weight:700;margin-bottom:0.4rem}
+.predictor-card p{color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem}
+.form-group{margin-bottom:1.2rem}
+label.lbl{display:block;font-size:0.82rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-select,.form-input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.75rem 1rem;border-radius:8px;font-size:0.9rem;outline:none}
+.form-select:focus,.form-input:focus{border-color:var(--accent)}
+.predict-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:0.85rem;border-radius:var(--radius);font-size:0.95rem;font-weight:600;cursor:pointer;margin-top:0.5rem}
+.predict-btn:hover{opacity:0.85}
+.predict-results{margin-top:2rem}
+.predict-results h3{font-size:0.95rem;font-weight:600;margin-bottom:1rem;color:var(--muted)}
+.predict-list{display:grid;gap:0.8rem}
+.predict-row{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1.1rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s}
+.predict-row:hover{border-color:var(--accent)}
+.predict-college{font-weight:500;font-size:0.9rem}
+.predict-branch{font-size:0.78rem;color:var(--muted);margin-top:2px}
+.predict-chance{font-size:0.8rem;font-weight:600;padding:3px 10px;border-radius:20px}
+.chance-high{background:rgba(34,197,94,0.15);color:#4ade80}
+.chance-med{background:rgba(245,158,11,0.15);color:#fbbf24}
+.chance-low{background:rgba(239,68,68,0.12);color:#f87171}
+.no-results{text-align:center;padding:2rem;color:var(--muted);font-size:0.9rem}
+
+/* PAGE TITLE */
+.page-header{margin-bottom:1.5rem}
+.page-header h1{font-size:1.6rem;font-weight:700;margin-bottom:0.3rem}
+.page-header p{color:var(--muted);font-size:0.9rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#22c55e;color:#fff;padding:0.8rem 1.3rem;border-radius:10px;font-size:0.88rem;font-weight:600;opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:999}
+.toast.show{opacity:1}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--primary)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Campas<span>IQ</span></div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showView('listing',this)">Browse Colleges</div>
+    <div class="nav-tab" onclick="showView('compare',this)">Compare <span class="compare-badge" id="compare-count">0</span></div>
+    <div class="nav-tab" onclick="showView('predictor',this)">Rank Predictor</div>
+  </div>
+</nav>
+
+<!-- LISTING VIEW -->
+<div class="view active" id="view-listing">
+  <div class="page-header">
+    <h1>Discover Top Colleges</h1>
+    <p>Search and filter from 50+ premier institutions across India</p>
+  </div>
+  <div class="search-wrap">
+    <div class="search-row">
+      <input class="search-input" id="search-input" type="text" placeholder="Search college name..." oninput="applyFilters()">
+    </div>
+    <div class="filter-row">
+      <select class="filter" id="filter-state" onchange="applyFilters()">
+        <option value="">All States</option>
+      </select>
+      <select class="filter" id="filter-type" onchange="applyFilters()">
+        <option value="">All Types</option>
+        <option value="IIT">IIT</option>
+        <option value="NIT">NIT</option>
+        <option value="Private">Private</option>
+        <option value="Deemed">Deemed</option>
+        <option value="Government">Government</option>
+      </select>
+      <select class="filter" id="filter-fees" onchange="applyFilters()">
+        <option value="">Any Fees</option>
+        <option value="low">Under ₹1L/yr</option>
+        <option value="mid">₹1L–₹5L/yr</option>
+        <option value="high">Above ₹5L/yr</option>
+      </select>
+      <button class="clear-btn" onclick="clearFilters()">Clear filters</button>
+    </div>
+  </div>
+  <div class="results-meta" id="results-meta"></div>
+  <div class="college-grid" id="college-grid"></div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- DETAIL VIEW -->
+<div class="view" id="view-detail">
+  <button class="back-btn" onclick="goBack()">← Back to listings</button>
+  <div id="detail-content"></div>
+</div>
+
+<!-- COMPARE VIEW -->
+<div class="view" id="view-compare">
+  <div class="page-header">
+    <h1>Compare Colleges</h1>
+    <p>Add colleges from the listings to compare them side by side</p>
+  </div>
+  <div id="compare-content"></div>
+</div>
+
+<!-- PREDICTOR VIEW -->
+<div class="view" id="view-predictor">
+  <div class="predictor-wrap">
+    <div class="predictor-card">
+      <h2>College Predictor</h2>
+      <p>Enter your exam and rank to see which colleges you're likely to get into</p>
+      <div class="form-group">
+        <label class="lbl">Exam</label>
+        <select class="form-select" id="pred-exam" onchange="updateBranches()">
+          <option value="JEE_MAIN">JEE Main</option>
+          <option value="JEE_ADV">JEE Advanced</option>
+          <option value="GATE">GATE</option>
+          <option value="CAT">CAT</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="lbl">Your Rank</label>
+        <input class="form-input" type="number" id="pred-rank" placeholder="e.g. 5000" min="1">
+      </div>
+      <div class="form-group">
+        <label class="lbl">Preferred Branch</label>
+        <select class="form-select" id="pred-branch">
+          <option value="">Any Branch</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="lbl">Category</label>
+        <select class="form-select" id="pred-category">
+          <option value="General">General</option>
+          <option value="OBC">OBC</option>
+          <option value="SC">SC</option>
+          <option value="ST">ST</option>
+          <option value="EWS">EWS</option>
+        </select>
+      </div>
+      <button class="predict-btn" onclick="runPredictor()">Predict My Colleges →</button>
+    </div>
+    <div class="predict-results" id="predict-results"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATASET =====
+const COLORS=['#e94560','#0f3460','#533483','#05bfdb','#1b6ca8','#e84545','#c77dff','#48cae4','#f9844a','#06d6a0'];
+
+const COLLEGES=[
+  {id:1,name:'IIT Bombay',short:'IITB',state:'Maharashtra',city:'Mumbai',type:'IIT',rating:4.9,fees:250000,avgPkg:2200000,highPkg:6500000,placement:97,naac:'A++',estd:1958,courses:['B.Tech CSE','B.Tech EE','B.Tech Mech','B.Tech Civil','B.Tech Chem','M.Tech','MBA','PhD'],intake:900,recruiters:['Google','Microsoft','Goldman Sachs','McKinsey','DE Shaw'],color:'#e94560',reviews:[{user:'Rahul K.',rating:5,text:'World-class faculty and research opportunities. Placement cell is exceptional.'},{user:'Priya M.',rating:4.5,text:'Amazing campus life. Tech fests are legendary. Some courses are very demanding.'},{user:'Arjun S.',rating:5,text:'Best engineering college in India. Opened doors globally for me.'}],jeeAdv:{CSE:[1,50],EE:[51,200],Mech:[201,500],Civil:[501,1000],Chem:[1001,2000]}},
+  {id:2,name:'IIT Delhi',short:'IITD',state:'Delhi',city:'New Delhi',type:'IIT',rating:4.8,fees:230000,avgPkg:2000000,highPkg:6200000,placement:96,naac:'A++',estd:1961,courses:['B.Tech CSE','B.Tech EE','B.Tech Mech','B.Tech Textile','M.Tech','MBA'],intake:850,recruiters:['Amazon','Google','Samsung','Qualcomm','Bain & Co'],color:'#0f3460',reviews:[{user:'Sneha R.',rating:5,text:'Delhi location is a huge advantage. Great industry connections.'},{user:'Vikram P.',rating:4.8,text:'Excellent research environment. Faculty is top-notch.'}],jeeAdv:{CSE:[1,60],EE:[61,250],Mech:[251,600],Textile:[2001,4000]}},
+  {id:3,name:'IIT Madras',short:'IITM',state:'Tamil Nadu',city:'Chennai',type:'IIT',rating:4.8,fees:240000,avgPkg:1900000,highPkg:5800000,placement:95,naac:'A++',estd:1959,courses:['B.Tech CSE','B.Tech EE','B.Tech Ocean Engg','B.Tech Aero','M.Tech'],intake:800,recruiters:['Flipkart','Uber','Ola','NVIDIA','JP Morgan'],color:'#533483',reviews:[{user:'Arun V.',rating:5,text:'Beautiful forested campus. Strong in research and sports.'},{user:'Kavya N.',rating:4.7,text:'The deer on campus alone are worth it! Great academics too.'}],jeeAdv:{CSE:[1,80],EE:[81,300],Aero:[301,700],Ocean:[3000,6000]}},
+  {id:4,name:'IIT Kharagpur',short:'IITKGP',state:'West Bengal',city:'Kharagpur',type:'IIT',rating:4.7,fees:220000,avgPkg:1700000,highPkg:5500000,placement:94,naac:'A++',estd:1951,courses:['B.Tech CSE','B.Tech EE','B.Tech Mech','B.Tech Mining','B.Tech Arch','M.Tech'],intake:1200,recruiters:['TCS','Infosys','Amazon','Cognizant','Oracle'],color:'#05bfdb',reviews:[{user:'Dev B.',rating:4.5,text:'Oldest IIT with a massive campus. Great alumni network.'},{user:'Nisha T.',rating:4.6,text:'Strong in both tech and humanities. Fest culture is amazing.'}],jeeAdv:{CSE:[50,150],EE:[150,450],Mech:[450,900],Mining:[3000,7000]}},
+  {id:5,name:'BITS Pilani',short:'BITS',state:'Rajasthan',city:'Pilani',type:'Deemed',rating:4.7,fees:550000,avgPkg:1600000,highPkg:5000000,placement:92,naac:'A',estd:1964,courses:['B.E. CSE','B.E. EEE','B.E. Mech','B.Pharm','M.Sc Physics','MBA'],intake:1000,recruiters:['Microsoft','Adobe','Visa','PayPal','Zomato'],color:'#1b6ca8',reviews:[{user:'Rohit A.',rating:4.8,text:'Best private engineering college. Practice School internships are gold.'},{user:'Simran K.',rating:4.6,text:'Liberal academic structure. Can do dual degrees easily.'}],jeeAdv:null,bitsat:{CSE:[1,120],EEE:[120,200],Mech:[200,350]}},
+  {id:6,name:'NIT Trichy',short:'NITT',state:'Tamil Nadu',city:'Tiruchirappalli',type:'NIT',rating:4.5,fees:180000,avgPkg:1200000,highPkg:3500000,placement:90,naac:'A++',estd:1964,courses:['B.Tech CSE','B.Tech ECE','B.Tech Mech','B.Tech Civil','B.Tech Chem','M.Tech'],intake:700,recruiters:['TCS','Wipro','HCL','Bosch','Amazon'],color:'#e84545',reviews:[{user:'Meena S.',rating:4.5,text:'Best NIT in South India. Strong placement track record.'},{user:'Gopal R.',rating:4.3,text:'Affordable fees with excellent outcome. Value for money.'}],jeeMain:{CSE:[1,1500],ECE:[1500,5000],Mech:[5000,15000],Civil:[15000,30000]}},
+  {id:7,name:'NIT Surathkal',short:'NITK',state:'Karnataka',city:'Mangaluru',type:'NIT',rating:4.4,fees:165000,avgPkg:1100000,highPkg:3200000,placement:88,naac:'A+',estd:1960,courses:['B.Tech CSE','B.Tech IT','B.Tech EE','B.Tech Mech','B.Tech Chem'],intake:600,recruiters:['Infosys','Cognizant','Amazon','Samsung','Mindtree'],color:'#c77dff',reviews:[{user:'Ravi K.',rating:4.4,text:'Beautiful coastal location. Good tech culture and startups.'},{user:'Asha P.',rating:4.3,text:'Faculty is very supportive. Beach nearby is a bonus!'}],jeeMain:{CSE:[1500,4000],IT:[4000,8000],EE:[8000,20000],Mech:[20000,40000]}},
+  {id:8,name:'VIT Vellore',short:'VIT',state:'Tamil Nadu',city:'Vellore',type:'Private',rating:4.2,fees:800000,avgPkg:700000,highPkg:2500000,placement:86,naac:'A++',estd:1984,courses:['B.Tech CSE','B.Tech IT','B.Tech ECE','B.Tech Mech','B.Tech Biotech','MBA'],intake:5000,recruiters:['TCS','Capgemini','Cognizant','HCL','IBM'],color:'#48cae4',reviews:[{user:'Sam T.',rating:4.0,text:'Great campus and infrastructure. Huge college but good clubs.'},{user:'Lisa M.',rating:4.2,text:'Good placement for IT. Core engineering could be better.'}],jeeMain:null},
+  {id:9,name:'Manipal Institute of Technology',short:'MIT',state:'Karnataka',city:'Manipal',type:'Private',rating:4.1,fees:850000,avgPkg:650000,highPkg:2200000,placement:84,naac:'A+',estd:1957,courses:['B.Tech CSE','B.Tech ECE','B.Tech Mech','B.Tech Civil','B.Tech IT','MBA'],intake:3000,recruiters:['Infosys','Wipro','Oracle','TCS','UST Global'],color:'#f9844a',reviews:[{user:'Anu B.',rating:4.0,text:'Medical town has great life quality. Tech fest is amazing.'},{user:'Sai V.',rating:4.1,text:'Decent placements, great campus and lifestyle.'}],jeeMain:null},
+  {id:10,name:'IIT Roorkee',short:'IITR',state:'Uttarakhand',city:'Roorkee',type:'IIT',rating:4.6,fees:245000,avgPkg:1800000,highPkg:5200000,placement:93,naac:'A++',estd:1847,courses:['B.Tech CSE','B.Tech EE','B.Tech Civil','B.Tech Mech','B.Tech Architecture'],intake:1000,recruiters:['Goldman Sachs','Qualcomm','AMD','Samsung','Deloitte'],color:'#06d6a0',reviews:[{user:'Kiran J.',rating:4.6,text:'Oldest technical university. Excellent civil and architecture.'},{user:'Pooja L.',rating:4.5,text:'Great faculty. Saharanpur and Roorkee both have campuses.'}],jeeAdv:{CSE:[60,180],EE:[180,500],Civil:[500,1200],Mech:[400,900]}},
+  {id:11,name:'IIT Kanpur',short:'IITK',state:'Uttar Pradesh',city:'Kanpur',type:'IIT',rating:4.8,fees:235000,avgPkg:2100000,highPkg:6000000,placement:95,naac:'A++',estd:1959,courses:['B.Tech CSE','B.Tech EE','B.Tech Aero','B.Tech Mech','B.Tech Physics','M.Tech'],intake:750,recruiters:['Google','DE Shaw','Microsoft','McKinsey','NVIDIA'],color:'#e94560',reviews:[{user:'Harsh G.',rating:4.9,text:'Known for unconventional pedagogy. Great for research.'},{user:'Neha T.',rating:4.7,text:'Excellent for core engineering. Faculty very accessible.'}],jeeAdv:{CSE:[1,70],EE:[70,220],Aero:[220,600],Mech:[300,750]}},
+  {id:12,name:'Amrita Vishwa Vidyapeetham',short:'AVV',state:'Tamil Nadu',city:'Coimbatore',type:'Deemed',rating:4.0,fees:700000,avgPkg:600000,highPkg:2000000,placement:82,naac:'A++',estd:2003,courses:['B.Tech CSE','B.Tech ECE','B.Tech EEE','B.Tech Mech','MBA'],intake:4000,recruiters:['TCS','Wipro','HCL','L&T','Mindtree'],color:'#533483',reviews:[{user:'Karan M.',rating:4.0,text:'Good campus life. Spiritual atmosphere is unique.'},{user:'Divya S.',rating:3.9,text:'Placement is decent. Fees are on the higher side.'}],jeeMain:null},
+  {id:13,name:'NIT Warangal',short:'NITW',state:'Telangana',city:'Warangal',type:'NIT',rating:4.4,fees:170000,avgPkg:1000000,highPkg:3000000,placement:87,naac:'A++',estd:1959,courses:['B.Tech CSE','B.Tech ECE','B.Tech EE','B.Tech Mech','B.Tech Chem','M.Tech'],intake:650,recruiters:['Microsoft','Amazon','Cognizant','TCS','Infosys'],color:'#05bfdb',reviews:[{user:'Aruna R.',rating:4.4,text:'Strong tech culture. Good research environment.'},{user:'Rajan K.',rating:4.3,text:'Best NIT in Telangana. Friendly campus vibe.'}],jeeMain:{CSE:[1000,3000],ECE:[3000,8000],EE:[8000,18000],Mech:[18000,35000]}},
+  {id:14,name:'SRM Institute of Science and Technology',short:'SRM',state:'Tamil Nadu',city:'Kattankulathur',type:'Private',rating:3.9,fees:950000,avgPkg:550000,highPkg:1800000,placement:80,naac:'A++',estd:1985,courses:['B.Tech CSE','B.Tech IT','B.Tech ECE','B.Tech Mech','MBA','MCA'],intake:8000,recruiters:['TCS','Infosys','Wipro','HCL','Capgemini'],color:'#1b6ca8',reviews:[{user:'Jai S.',rating:3.8,text:'Good infrastructure. Placements for CSE are decent.'},{user:'Mala T.',rating:4.0,text:'Large campus with good facilities. Lots of clubs.'}],jeeMain:null},
+  {id:15,name:'IIT Hyderabad',short:'IITH',state:'Telangana',city:'Hyderabad',type:'IIT',rating:4.5,fees:250000,avgPkg:1700000,highPkg:5000000,placement:92,naac:'A',estd:2008,courses:['B.Tech CSE','B.Tech EE','B.Tech Mech','B.Tech Chemical','B.Tech AI','M.Tech'],intake:500,recruiters:['Google','Amazon','Qualcomm','Samsung','Oracle'],color:'#e84545',reviews:[{user:'Teja R.',rating:4.5,text:'New IIT but great momentum. AI program is pioneering.'},{user:'Sriya M.',rating:4.4,text:'Great research culture. Hyderabad tech scene is amazing.'}],jeeAdv:{CSE:[80,250],EE:[250,600],AI:[100,300],Mech:[600,1400]}},
+];
+
+// STATE
+let compareList=[];
+let currentPage=1;
+const PER_PAGE=6;
+let filteredColleges=[...COLLEGES];
+let prevView='listing';
+
+// ===== INIT =====
+function init(){
+  populateStateFilter();
+  applyFilters();
+  updateBranches();
+}
+
+function populateStateFilter(){
+  const states=[...new Set(COLLEGES.map(c=>c.state))].sort();
+  const sel=document.getElementById('filter-state');
+  states.forEach(s=>{
+    const o=document.createElement('option');
+    o.value=s;o.textContent=s;
+    sel.appendChild(o);
+  });
+}
+
+// ===== FILTERS =====
+function applyFilters(){
+  const q=document.getElementById('search-input').value.toLowerCase().trim();
+  const state=document.getElementById('filter-state').value;
+  const type=document.getElementById('filter-type').value;
+  const fees=document.getElementById('filter-fees').value;
+  filteredColleges=COLLEGES.filter(c=>{
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.city.toLowerCase().includes(q))return false;
+    if(state&&c.state!==state)return false;
+    if(type&&c.type!==type)return false;
+    if(fees==='low'&&c.fees>=100000)return false;
+    if(fees==='mid'&&(c.fees<100000||c.fees>=500000))return false;
+    if(fees==='high'&&c.fees<500000)return false;
+    return true;
+  });
+  currentPage=1;
+  renderGrid();
+}
+
+function clearFilters(){
+  document.getElementById('search-input').value='';
+  document.getElementById('filter-state').value='';
+  document.getElementById('filter-type').value='';
+  document.getElementById('filter-fees').value='';
+  applyFilters();
+}
+
+// ===== GRID =====
+function renderGrid(){
+  const grid=document.getElementById('college-grid');
+  const meta=document.getElementById('results-meta');
+  const total=filteredColleges.length;
+  meta.textContent=`Showing ${total} college${total!==1?'s':''}`;
+  const start=(currentPage-1)*PER_PAGE;
+  const page=filteredColleges.slice(start,start+PER_PAGE);
+  if(!page.length){grid.innerHTML='<div class="no-results" style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--muted)">No colleges match your filters.</div>';renderPagination();return;}
+  grid.innerHTML=page.map(c=>cardHTML(c)).join('');
+  renderPagination();
+}
+
+function cardHTML(c){
+  const inCompare=compareList.includes(c.id);
+  const stars='★'.repeat(Math.round(c.rating))+'☆'.repeat(5-Math.round(c.rating));
+  return `<div class="college-card" id="card-${c.id}">
+    <div class="card-top">
+      <div class="college-logo" style="background:${c.color}20;color:${c.color}">${c.short}</div>
+      <div class="card-title">
+        <div class="card-name">${c.name}</div>
+        <div class="card-location">${c.city}, ${c.state}</div>
+        <div class="card-rating">${stars} ${c.rating} · ${c.type} · Est. ${c.estd}</div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <span class="chip">₹${(c.fees/100000).toFixed(1)}L/yr</span>
+      <span class="chip green">Avg ₹${(c.avgPkg/100000).toFixed(1)}L pkg</span>
+      <span class="chip">${c.placement}% placed</span>
+      <span class="chip">${c.naac}</span>
+    </div>
+    <div class="card-actions">
+      <button class="btn-sm btn-primary" onclick="showDetail(${c.id})">View Details</button>
+      <button class="btn-sm btn-outline ${inCompare?'added':''}" id="cmp-${c.id}" onclick="toggleCompare(${c.id},event)">${inCompare?'✓ Added':'+ Compare'}</button>
+    </div>
+  </div>`;
+}
+
+function renderPagination(){
+  const total=filteredColleges.length;
+  const pages=Math.ceil(total/PER_PAGE);
+  const el=document.getElementById('pagination');
+  if(pages<=1){el.innerHTML='';return;}
+  let h=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=pages;i++){
+    if(i===1||i===pages||Math.abs(i-currentPage)<=1){
+      h+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if(Math.abs(i-currentPage)===2){
+      h+=`<span class="page-info">…</span>`;
+    }
+  }
+  h+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+  el.innerHTML=h;
+}
+
+function goPage(p){
+  const pages=Math.ceil(filteredColleges.length/PER_PAGE);
+  if(p<1||p>pages)return;
+  currentPage=p;
+  renderGrid();
+  document.getElementById('view-listing').scrollTo(0,0);
+}
+
+// ===== COMPARE =====
+function toggleCompare(id,e){
+  e&&e.stopPropagation();
+  const idx=compareList.indexOf(id);
+  if(idx>-1){
+    compareList.splice(idx,1);
+    showToast('Removed from compare');
+  } else {
+    if(compareList.length>=3){showToast('Max 3 colleges to compare');return;}
+    compareList.push(id);
+    showToast('Added to compare!');
+  }
+  document.getElementById('compare-count').textContent=compareList.length;
+  const btn=document.getElementById(`cmp-${id}`);
+  if(btn){
+    btn.textContent=compareList.includes(id)?'✓ Added':'+ Compare';
+    btn.className=`btn-sm btn-outline ${compareList.includes(id)?'added':''}`;
+  }
+}
+
+function renderCompare(){
+  const el=document.getElementById('compare-content');
+  if(!compareList.length){
+    el.innerHTML=`<div class="compare-intro"><h2>No colleges selected</h2><p>Go to Browse Colleges and click "+ Compare" on any college card to add it here (up to 3).</p></div>`;
+    return;
+  }
+  const cols=compareList.map(id=>COLLEGES.find(c=>c.id===id));
+  const rows=[
+    {lbl:'Type',fn:c=>c.type},
+    {lbl:'Location',fn:c=>`${c.city}, ${c.state}`},
+    {lbl:'Established',fn:c=>c.estd},
+    {lbl:'Annual Fees',fn:c=>`₹${(c.fees/100000).toFixed(1)}L`,best:(a,b)=>a.fees<b.fees},
+    {lbl:'Avg Package',fn:c=>`₹${(c.avgPkg/100000).toFixed(1)}L`,best:(a,b)=>a.avgPkg>b.avgPkg},
+    {lbl:'Highest Package',fn:c=>`₹${(c.highPkg/100000).toFixed(1)}L`,best:(a,b)=>a.highPkg>b.highPkg},
+    {lbl:'Placement %',fn:c=>`${c.placement}%`,best:(a,b)=>a.placement>b.placement},
+    {lbl:'Rating',fn:c=>`${'★'.repeat(Math.round(c.rating))} ${c.rating}`,best:(a,b)=>a.rating>b.rating},
+    {lbl:'NAAC Grade',fn:c=>c.naac},
+    {lbl:'Intake',fn:c=>c.intake,best:(a,b)=>false},
+    {lbl:'Courses',fn:c=>c.courses.slice(0,3).join(', ')+(c.courses.length>3?' …':'')},
+    {lbl:'Top Recruiters',fn:c=>c.recruiters.slice(0,3).join(', ')},
+  ];
+  let h=`<div class="compare-controls">`;
+  cols.forEach(c=>{
+    h+=`<span style="background:var(--card);border:1px solid var(--border);padding:5px 12px;border-radius:8px;font-size:0.82rem;">${c.short} <button class="compare-remove" onclick="removeCompare(${c.id})">✕</button></span>`;
+  });
+  h+=`</div><div class="compare-table-wrap"><table class="compare"><thead><tr><th>Attribute</th>`;
+  cols.forEach(c=>{h+=`<th><div class="compare-college-header">${c.name}</div><div class="compare-college-loc">${c.city}</div></th>`;});
+  h+=`</tr></thead><tbody>`;
+  rows.forEach(row=>{
+    h+=`<tr><td>${row.lbl}</td>`;
+    cols.forEach((c,i)=>{
+      let isBest=false;
+      if(row.best&&cols.length>1){
+        isBest=cols.every((oc,oi)=>oi===i||row.best(c,oc));
+      }
+      h+=`<td class="${isBest?'best':''}">${row.fn(c)}</td>`;
+    });
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  el.innerHTML=h;
+}
+
+function removeCompare(id){
+  compareList=compareList.filter(x=>x!==id);
+  document.getElementById('compare-count').textContent=compareList.length;
+  const btn=document.getElementById(`cmp-${id}`);
+  if(btn){btn.textContent='+ Compare';btn.className='btn-sm btn-outline';}
+  renderCompare();
+}
+
+// ===== DETAIL =====
+function showDetail(id){
+  prevView='listing';
+  const c=COLLEGES.find(x=>x.id===id);
+  if(!c)return;
+  const stars=c.rating;
+  const el=document.getElementById('detail-content');
+  el.innerHTML=`
+  <div class="detail-hero">
+    <div class="detail-hero-top">
+      <div class="detail-logo" style="background:${c.color}20;color:${c.color}">${c.short}</div>
+      <div class="detail-title">
+        <h1>${c.name}</h1>
+        <div class="loc">📍 ${c.city}, ${c.state} · Est. ${c.estd} · ${c.type}</div>
+        <div style="color:var(--warn);font-weight:600">★ ${c.rating}/5 · NAAC ${c.naac}</div>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val">₹${(c.fees/100000).toFixed(1)}L</div><div class="stat-lbl">Annual Fees</div></div>
+      <div class="stat-box"><div class="stat-val">${c.placement}%</div><div class="stat-lbl">Placement</div></div>
+      <div class="stat-box"><div class="stat-val">₹${(c.avgPkg/100000).toFixed(1)}L</div><div class="stat-lbl">Avg Package</div></div>
+      <div class="stat-box"><div class="stat-val">₹${(c.highPkg/100000).toFixed(1)}L</div><div class="stat-lbl">Highest Pkg</div></div>
+      <div class="stat-box"><div class="stat-val">${c.intake}</div><div class="stat-lbl">Intake/yr</div></div>
+    </div>
+  </div>
+  <div class="section-tabs">
+    <div class="section-tab active" onclick="switchSection('courses',this)">Courses</div>
+    <div class="section-tab" onclick="switchSection('placements',this)">Placements</div>
+    <div class="section-tab" onclick="switchSection('reviews',this)">Reviews</div>
+  </div>
+  <div class="section-content active" id="sec-courses">
+    <div class="course-list">
+    ${c.courses.map(course=>`
+      <div class="course-row">
+        <div class="course-name">${course}</div>
+        <div class="course-meta">
+          <span class="chip">4 yrs</span>
+          <span class="chip green">Seats: ${Math.floor(c.intake/c.courses.length)}</span>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="section-content" id="sec-placements">
+    <div class="placement-grid">
+      <div class="placement-stat"><div class="placement-val" style="color:var(--success)">${c.placement}%</div><div class="placement-lbl">Placement Rate</div></div>
+      <div class="placement-stat"><div class="placement-val" style="color:var(--info)">₹${(c.avgPkg/100000).toFixed(1)}L</div><div class="placement-lbl">Avg Package</div></div>
+      <div class="placement-stat"><div class="placement-val" style="color:var(--accent)">₹${(c.highPkg/100000).toFixed(1)}L</div><div class="placement-lbl">Highest Package</div></div>
+      <div class="placement-stat"><div class="placement-val" style="color:var(--warn)">150+</div><div class="placement-lbl">Recruiters</div></div>
+    </div>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem">Top recruiting companies:</p>
+    <div class="recruiter-list">
+    ${c.recruiters.map(r=>`<div class="recruiter-chip">${r}</div>`).join('')}
+    </div>
+  </div>
+  <div class="section-content" id="sec-reviews">
+    <div class="review-list">
+    ${c.reviews.map(r=>`
+      <div class="review-card">
+        <div class="review-header">
+          <span class="reviewer">${r.user}</span>
+          <span class="review-rating">★ ${r.rating}</span>
+        </div>
+        <div class="review-text">${r.text}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+  showView('detail',null);
+}
+
+function switchSection(id,tab){
+  document.querySelectorAll('.section-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section-content').forEach(s=>s.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+}
+
+// ===== PREDICTOR =====
+const BRANCHES_BY_EXAM={
+  JEE_MAIN:['CSE','ECE','EE','Mech','Civil','Chem','IT'],
+  JEE_ADV:['CSE','EE','Mech','Aero','Civil','Chem'],
+  GATE:['CSE','EE','Mech','Civil','Chem'],
+  CAT:['MBA','General Management','Finance','Marketing'],
+};
+
+function updateBranches(){
+  const exam=document.getElementById('pred-exam').value;
+  const sel=document.getElementById('pred-branch');
+  const branches=BRANCHES_BY_EXAM[exam]||[];
+  sel.innerHTML='<option value="">Any Branch</option>'+branches.map(b=>`<option value="${b}">${b}</option>`).join('');
+}
+
+function runPredictor(){
+  const exam=document.getElementById('pred-exam').value;
+  const rank=parseInt(document.getElementById('pred-rank').value);
+  const branch=document.getElementById('pred-branch').value;
+  const cat=document.getElementById('pred-category').value;
+  if(!rank||rank<1){document.getElementById('predict-results').innerHTML='<div class="no-results">Please enter a valid rank.</div>';return;}
+
+  const catMult={General:1,OBC:1.3,SC:2.0,ST:2.5,EWS:1.2}[cat]||1;
+  const adjRank=Math.round(rank/catMult);
+
+  const results=[];
+  COLLEGES.forEach(c=>{
+    let rangeMap=null;
+    if(exam==='JEE_ADV'&&c.jeeAdv)rangeMap=c.jeeAdv;
+    else if(exam==='JEE_MAIN'&&c.jeeMain)rangeMap=c.jeeMain;
+    else if(exam==='GATE'&&c.type==='IIT')rangeMap={CSE:[1,2000],EE:[1,1500],Mech:[1,1500],Civil:[1,1000]};
+    else if(exam==='CAT')rangeMap={MBA:[1,5000],General:[1,8000]};
+    if(!rangeMap)return;
+
+    const branches=branch?{[branch]:rangeMap[branch]||rangeMap[Object.keys(rangeMap)[0]]}:rangeMap;
+    Object.entries(branches).forEach(([br,range])=>{
+      if(!range)return;
+      const[lo,hi]=range;
+      let chance='low',chanceClass='chance-low';
+      if(adjRank<=hi*1.5){
+        if(adjRank<=lo*1.2){chance='High';chanceClass='chance-high';}
+        else if(adjRank<=hi){chance='Medium';chanceClass='chance-med';}
+        else{chance='Low';chanceClass='chance-low';}
+        results.push({college:c,branch:br,chance,chanceClass,lo,hi});
+      }
+    });
+  });
+
+  results.sort((a,b)=>{
+    const order={High:0,Medium:1,Low:2};
+    return order[a.chance]-order[b.chance];
+  });
+
+  const el=document.getElementById('predict-results');
+  if(!results.length){
+    el.innerHTML=`<div class="predict-results"><div class="no-results">No matches found for rank ${rank}. Try a different exam or category.</div></div>`;
+    return;
+  }
+  el.innerHTML=`<div class="predict-results"><h3>Results for Rank ${rank} (${cat}) — ${results.length} college-branch combinations</h3>
+  <div class="predict-list">
+  ${results.slice(0,15).map(r=>`
+    <div class="predict-row" onclick="showDetail(${r.college.id})">
+      <div>
+        <div class="predict-college">${r.college.name}</div>
+        <div class="predict-branch">${r.branch} · Cutoff range: ${r.lo}–${r.hi}</div>
+      </div>
+      <span class="predict-chance ${r.chanceClass}">${r.chance} Chance</span>
+    </div>`).join('')}
+  </div></div>`;
+}
+
+// ===== NAVIGATION =====
+function showView(name,tab){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  if(tab)tab.classList.add('active');
+  if(name==='compare')renderCompare();
+}
+
+function goBack(){
+  showView(prevView,document.querySelector('.nav-tab'));
+  document.querySelector('.nav-tab').classList.add('active');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+init();
+</script>
+</body>
+</html>
