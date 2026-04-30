@@ -3,7 +3,7 @@ import { CollegeCard } from "@/components/CollegeCard";
 import { Search, Filter } from "lucide-react";
 
 export default async function CollegesPage(props: {
-  searchParams: Promise<{ q?: string; location?: string; minFees?: string; maxFees?: string }>;
+  searchParams: Promise<{ q?: string; location?: string; minFees?: string; maxFees?: string; examCategory?: string }>;
 }) {
   const searchParams = await props.searchParams;
   const q = searchParams.q || "";
