@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { CollegeCard } from "@/components/CollegeCard";
 import { Search, Filter } from "lucide-react";
+export const dynamic = "force-dynamic";
 
 export default async function CollegesPage(props: {
   searchParams: Promise<{ q?: string; location?: string; minFees?: string; maxFees?: string; examCategory?: string }>;

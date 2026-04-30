@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import ComparePage from "@/components/CompareClient";
+export const dynamic = "force-dynamic";
 
 export default async function Compare() {
   const allColleges = await prisma.college.findMany({

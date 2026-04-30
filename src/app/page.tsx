@@ -2,6 +2,7 @@ import { ArrowRight, Search, Scale, BrainCircuit, Users, CheckCircle } from "luc
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { CollegeCard } from "@/components/CollegeCard";
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const featuredColleges = await prisma.college.findMany({
