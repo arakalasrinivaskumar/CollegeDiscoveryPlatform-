@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { MessageSquare, User, Clock, ChevronRight, PlusCircle } from "lucide-react";
 import Link from "next/link";
+export const dynamic = "force-dynamic";
 
 export default async function DiscussionPage() {
   const questions = await prisma.question.findMany({
